@@ -1,20 +1,27 @@
+// script.js
 const chatForm = document.getElementById("chat-form");
 const userInput = document.getElementById("user-input");
 const chatBox = document.getElementById("chat-box");
 const messageSound = new Audio("static/message.mp3");
+const chatList = document.getElementById("chat-list");
+const newChatBtn = document.getElementById("new-chat");
 
 let assistantName = "Claude";
+let currentChatId = null;
+let chats = {}; // Store chats in memory
 
-// Met à jour le nom affiché de l’assistant
-document.getElementById("assistant-name").addEventListener("input", (e) => {
+// Met à jour le nom de l'assistant
+const nameInput = document.getElementById("assistant-name");
+nameInput.addEventListener("input", (e) => {
   assistantName = e.target.value || "Claude";
   document.querySelectorAll(".bubble.assistant .name").forEach(el => {
     el.textContent = assistantName;
   });
 });
 
-// Met à jour les couleurs pastel en live
-document.querySelectorAll(".color-button").forEach(btn => {
+// Choix de couleur pastel pour les bulles
+const colorButtons = document.querySelectorAll(".color-button");
+colorButtons.forEach(btn => {
   btn.addEventListener("click", () => {
     const color = btn.dataset.color;
     document.documentElement.style.setProperty('--bubble-color', color);
@@ -22,7 +29,49 @@ document.querySelectorAll(".color-button").forEach(btn => {
   });
 });
 
-// Ajoute une bulle dans la fenêtre de discussion
+// Création d'une nouvelle discussion
+newChatBtn.addEventListener("click", () => {
+  const id = Date.now();
+  chats[id] = [];
+  currentChatId = id;
+  renderChatList();
+  chatBox.innerHTML = "";
+});
+
+// Affiche la liste des discussions avec boutons de suppression
+function renderChatList() {
+  chatList.innerHTML = "";
+  Object.keys(chats).forEach(id => {
+    const li = document.createElement("li");
+    li.textContent = `Chat ${id}`;
+    li.addEventListener("click", () => {
+      currentChatId = id;
+      loadChat(id);
+    });
+
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "×";
+    delBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      delete chats[id];
+      if (currentChatId === id) {
+        currentChatId = null;
+        chatBox.innerHTML = "";
+      }
+      renderChatList();
+    });
+
+    li.appendChild(delBtn);
+    chatList.appendChild(li);
+  });
+}
+
+function loadChat(id) {
+  chatBox.innerHTML = "";
+  chats[id].forEach(msg => displayMessage(msg.text, msg.sender));
+}
+
+// Affiche un message dans le chat
 function displayMessage(text, sender) {
   const bubble = document.createElement("div");
   bubble.classList.add("bubble", sender);
@@ -42,13 +91,17 @@ function displayMessage(text, sender) {
   chatBox.scrollTop = chatBox.scrollHeight;
 
   if (sender === "assistant") messageSound.play();
+
+  if (currentChatId) {
+    chats[currentChatId].push({ text, sender });
+  }
 }
 
-// Soumet le message à l’API locale
+// Envoie du message à l’API Flask
 chatForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const message = userInput.value.trim();
-  if (!message) return;
+  if (!message || currentChatId === null) return;
 
   displayMessage(message, "user");
   userInput.value = "";
@@ -61,19 +114,9 @@ chatForm.addEventListener("submit", async (e) => {
       },
       body: JSON.stringify({ message })
     });
-
     const data = await res.json();
     displayMessage(data.reply, "assistant");
   } catch (err) {
-    console.error("Erreur :", err);
     displayMessage("[Erreur serveur]", "assistant");
   }
-});
-document.getElementById("new-chat").addEventListener("click", () => {
-  const name = prompt("Nom de la conversation ?");
-  if (!name) return;
-  const li = document.createElement("li");
-  li.textContent = name;
-  li.contentEditable = true;
-  document.getElementById("chat-list").appendChild(li);
 });
