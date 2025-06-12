@@ -1,5 +1,3 @@
-# server.py
-
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -23,7 +21,7 @@ def chat():
     }
 
     payload = {
-        "model": "anthropic/claude-3-opus",
+        "model": "meta-llama/llama-3-8b-instruct:nitro",
         "messages": [
             {"role": "user", "content": user_msg}
         ]
