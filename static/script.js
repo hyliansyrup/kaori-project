@@ -6,6 +6,11 @@ const chatBox = document.getElementById("chat-box");
 const messageSound = new Audio("static/message.mp3");
 const chatList = document.getElementById("chat-list");
 const newChatButton = document.getElementById("new-chat");
+const sidebar = document.querySelector(".sidebar");
+const toggleSidebarButton = document.createElement("button");
+toggleSidebarButton.id = "toggle-sidebar";
+toggleSidebarButton.textContent = "☰";
+document.body.appendChild(toggleSidebarButton);
 
 let assistantName = "Claude";
 let chats = [];
@@ -125,6 +130,13 @@ chatForm.addEventListener("submit", async (e) => {
     displayMessage("[Erreur serveur]", "assistant");
   }
 });
+
+// Sidebar toggle
+let sidebarVisible = true;
+toggleSidebarButton.onclick = () => {
+  sidebarVisible = !sidebarVisible;
+  sidebar.style.display = sidebarVisible ? "flex" : "none";
+};
 
 // Initialisation
 loadChats();
