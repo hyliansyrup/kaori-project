@@ -23,7 +23,7 @@ def chat():
     }
 
     payload = {
-        "model": "anthropic/claude-3-haiku",
+        "model": "anthropic/claude-3-opus",
         "messages": [
             {"role": "user", "content": user_msg}
         ]
