@@ -9,7 +9,7 @@ load_dotenv()
 app = Flask(__name__, static_url_path='/static')
 CORS(app)
 
-API_KEY = os.getenv("OPENROUTER_API_KEY")
+API_KEY = os.getenv("GROQ_API_KEY")
 
 @app.route("/api/chat", methods=["POST"])
 def chat():
@@ -21,14 +21,14 @@ def chat():
     }
 
     payload = {
-        "model": "meta-llama/llama-3-8b-instruct:nitro",
+        "model": "llama3-8b-8192",
         "messages": [
             {"role": "user", "content": user_msg}
         ]
     }
 
     try:
-        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload)
+        response = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload)
         response.raise_for_status()
         reply = response.json()["choices"][0]["message"]["content"]
         return jsonify({"reply": reply})
