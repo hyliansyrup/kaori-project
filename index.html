@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kaori Chat</title>
+  <link rel="stylesheet" href="static/style.css?v=2">
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar">
+      <h2>Conversations</h2>
+      <ul id="chat-list"></ul>
+      <button id="new-chat">+ Nouveau chat</button>
+      <div class="assistant-settings">
+        <input type="text" id="assistant-name" placeholder="nom de l'assistant">
+        <div style="display: flex;">
+          <button class="color-button" data-color="#f6a6e3" style="background:#f6a6e3;"></button>
+          <button class="color-button" data-color="#a6d8f6" style="background:#a6d8f6;"></button>
+          <button class="color-button" data-color="#f6e3a6" style="background:#f6e3a6;"></button>
+          <button class="color-button" data-color="#c0f6a6" style="background:#c0f6a6;"></button>
+          <button class="color-button" data-color="#d9a6f6" style="background:#d9a6f6;"></button>
+        </div>
+      </div>
+    </div>
+    <div class="chat-area">
+      <div id="chat-box" class="chat-box"></div>
+      <form id="chat-form">
+        <input id="user-input" type="text" placeholder="écris quelque chose..." autocomplete="off">
+        <button type="submit">Envoyer</button>
+      </form>
+    </div>
+  </div>
+  <script src="static/script.js"></script>
+</body>
+</html>
