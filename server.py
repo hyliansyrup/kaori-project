@@ -1,3 +1,5 @@
+# server.py
+
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -14,19 +16,23 @@ API_KEY = os.getenv("OPENROUTER_API_KEY")
 @app.route("/api/chat", methods=["POST"])
 def chat():
     user_msg = request.json.get("message")
+
     headers = {
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json"
     }
+
     payload = {
         "model": "anthropic/claude-3-haiku",
-        "messages": [{"role": "user", "content": user_msg}]
+        "messages": [
+            {"role": "user", "content": user_msg}
+        ]
     }
 
     try:
-        res = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload)
-        res.raise_for_status()
-        reply = res.json()["choices"][0]["message"]["content"]
+        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload)
+        response.raise_for_status()
+        reply = response.json()["choices"][0]["message"]["content"]
         return jsonify({"reply": reply})
     except Exception as e:
         return jsonify({"reply": f"[Erreur serveur] {str(e)}"}), 500
@@ -36,7 +42,7 @@ def index():
     return send_from_directory("static", "index.html")
 
 @app.route("/static/<path:path>")
-def serve_static(path):
+def static_files(path):
     return send_from_directory("static", path)
 
 if __name__ == "__main__":
