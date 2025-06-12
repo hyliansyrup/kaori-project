@@ -35,15 +35,31 @@ body {
   top: 0;
   bottom: 0;
   overflow-y: auto;
-  transition: transform 0.3s ease;
   z-index: 2;
+  transition: transform 0.3s ease;
+}
+
+.sidebar.hidden {
+  transform: translateX(-100%);
+}
+
+.chat-area {
+  margin-left: 260px;
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 260px);
+  height: 100vh;
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.chat-area.expanded {
+  margin-left: 0;
+  width: 100%;
 }
 
 #toggle-sidebar {
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  z-index: 3;
+  align-self: flex-start;
+  margin-bottom: 8px;
   background-color: var(--accent-color);
   color: white;
   border: none;
@@ -54,7 +70,9 @@ body {
 }
 
 .sidebar h2 {
-  margin-top: 0;
+  margin: 0;
+  display: inline-block;
+  margin-left: 8px;
 }
 
 #chat-list {
@@ -97,15 +115,6 @@ body {
   border-radius: 8px;
   border: 1px solid #ccc;
   box-sizing: border-box;
-}
-
-.chat-area {
-  margin-left: 260px;
-  display: flex;
-  flex-direction: column;
-  width: calc(100% - 260px);
-  height: 100vh;
-  transition: margin-left 0.3s ease;
 }
 
 .chat-box {
