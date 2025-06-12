@@ -42,13 +42,28 @@ function updateChatList() {
 
 function deleteChat(index) {
   chats.splice(index, 1);
+
   if (currentChatIndex === index) {
-    currentChatIndex = -1;
     chatBox.innerHTML = "";
+    if (chats.length === 0) {
+      // crée une nouvelle discussion automatiquement
+      chats.push([]);
+      currentChatIndex = 0;
+    } else {
+      currentChatIndex = 0;
+    }
+  } else if (currentChatIndex > index) {
+    currentChatIndex--;
   }
+
   saveChats();
   updateChatList();
+  if (chats[currentChatIndex]) {
+    chatBox.innerHTML = "";
+    chats[currentChatIndex].forEach(msg => displayMessage(msg.text, msg.sender));
+  }
 }
+
 
 function switchChat(index) {
   currentChatIndex = index;
