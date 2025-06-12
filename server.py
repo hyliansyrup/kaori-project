@@ -1,62 +1,27 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify
+from dotenv import load_dotenv
 import os
 import requests
-from dotenv import load_dotenv
 
 load_dotenv()
-api_key = os.getenv("OPENROUTER_API_KEY")
+API_KEY = os.getenv("OPENROUTER_API_KEY")
 
-app = Flask(__name__, static_folder='static')
+app = Flask(__name__)
 
-@app.route("/")
-def index():
-    return send_from_directory('.', 'index.html')
+@app.route("/api/chat", methods=["POST"])
+def chat():
+    user_input = request.json["message"]
 
-@app.route("/ask", methods=["POST"])
-def ask():
-    data = request.get_json()
-    user_input = data.get("message", "")
+    payload = {
+        "model": "anthropic/claude-3-haiku",
+        "messages": [{"role": "user", "content": user_input}]
+    }
 
-    if not user_input:
-        return jsonify({"reply": "dis-moi un truc 👀"})
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",   # ← très important !
+        "Content-Type": "application/json"
+    }
 
-    try:
-        response = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json"
-            },
-            json={
-                "model": "anthropic/claude-3-haiku",
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": "tu es chill, toujours en minuscule, et tu parles comme un bon ami. tu tutoies toujours. tu ne te présentes jamais. tu restes simple, directe et naturelle. pas de blabla, pas de robotisme. tu t'adaptes au style de l'utilisateur. tu peux être drôle ou cash si c'est le ton."
-                    },
-                    {
-                        "role": "user",
-                        "content": user_input
-                    }
-                ]
-            }
-        )
-
-        data = response.json()
-
-        if "error" in data:
-            return jsonify({"reply": f"[Erreur OpenRouter] {data['error']['message']}"})
-
-        reply = data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
-
-        if not reply:
-            return jsonify({"reply": "[Erreur] Réponse vide ou incompréhensible."})
-
-        return jsonify({"reply": reply})
-
-    except Exception as e:
-        return jsonify({"reply": f"[Erreur serveur] {str(e)}"})
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000, debug=True)
-
+    response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload)
+    data = response.json()
+    return jsonify({"reply": data["choices"][0]["message"]["content"]})
