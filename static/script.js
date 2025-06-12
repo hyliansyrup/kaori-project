@@ -163,9 +163,38 @@ document.getElementById("toggle-theme").addEventListener("change", () => {
   const isDark = document.body.classList.contains("dark");
   const textColor = isDark ? "white" : "black";
 
+  // met à jour la couleur de texte dans toutes les bulles
   document.querySelectorAll(".bubble").forEach(b => {
     b.style.color = textColor;
   });
 
+  // met à jour le texte global (si jamais utilisé ailleurs)
   document.documentElement.style.setProperty('--text-color', textColor);
+
+  // met aussi à jour les inputs si besoin
+  document.querySelectorAll('input[type="text"], .assistant-settings input').forEach(el => {
+    el.style.color = textColor;
+    el.style.backgroundColor = isDark ? "#1a1a1a" : "#fff";
+    el.style.borderColor = isDark ? "#555" : "#ccc";
+  });
+
+  // met à jour le fond du formulaire
+  const form = document.querySelector("form");
+  if (form) {
+    form.style.backgroundColor = isDark ? "#2a2a2a" : "#fafafa";
+    form.style.borderTop = isDark ? "1px solid #444" : "1px solid #ddd";
+  }
+
+  // met à jour la sidebar
+  const sidebar = document.querySelector(".sidebar");
+  if (sidebar) {
+    sidebar.style.backgroundColor = isDark ? "#1f1f1f" : "#f2f2f2";
+    sidebar.style.borderRight = isDark ? "1px solid #444" : "1px solid #ccc";
+  }
+
+  // met à jour les éléments de la liste des discussions
+  document.querySelectorAll("#chat-list li").forEach(li => {
+    li.style.backgroundColor = isDark ? "#2a2a2a" : "#fff";
+    li.style.color = textColor;
+  });
 });
