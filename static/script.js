@@ -159,8 +159,13 @@ updateChatList();
 
 document.getElementById("toggle-theme").addEventListener("change", () => {
   document.body.classList.toggle("dark");
-  const textColor = document.body.classList.contains("dark") ? "white" : "black";
+
+  const isDark = document.body.classList.contains("dark");
+  const textColor = isDark ? "white" : "black";
+
   document.querySelectorAll(".bubble").forEach(b => {
     b.style.color = textColor;
   });
+
+  document.documentElement.style.setProperty('--text-color', textColor);
 });
