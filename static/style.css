@@ -135,7 +135,7 @@ button[type="submit"] {
 
 .bubble.user {
   background: var(--accent-color);
-  color: white;
+  color: black;
   align-self: flex-end;
   border-bottom-right-radius: 0;
 }
