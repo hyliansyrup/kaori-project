@@ -1,26 +1,28 @@
 const chatForm = document.getElementById("chat-form");
 const userInput = document.getElementById("user-input");
 const chatBox = document.getElementById("chat-box");
-
-// pour l’audio
 const messageSound = new Audio("static/message.mp3");
 
-// nom de l’assistant
 let assistantName = "Claude";
+
+// changement du nom de l’assistant
 document.getElementById("assistant-name").addEventListener("input", (e) => {
   assistantName = e.target.value || "Claude";
-});
-
-// changer couleur
-document.querySelectorAll(".color-button").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const color = btn.dataset.color;
-    document.documentElement.style.setProperty("--bubble-color", color);
-    document.documentElement.style.setProperty("--accent-color", color);
+  document.querySelectorAll(".bubble.assistant .name").forEach(el => {
+    el.textContent = assistantName;
   });
 });
 
-// afficher un message dans le chat
+// changement de couleurs instantané
+document.querySelectorAll(".color-button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const color = btn.dataset.color;
+    document.documentElement.style.setProperty('--bubble-color', color);
+    document.documentElement.style.setProperty('--accent-color', color);
+  });
+});
+
+// afficher un message
 function displayMessage(text, sender) {
   const bubble = document.createElement("div");
   bubble.classList.add("bubble", sender);
@@ -32,9 +34,9 @@ function displayMessage(text, sender) {
     bubble.appendChild(name);
   }
 
-  const msg = document.createElement("div");
-  msg.textContent = text;
-  bubble.appendChild(msg);
+  const messageText = document.createElement("div");
+  messageText.textContent = text;
+  bubble.appendChild(messageText);
 
   chatBox.appendChild(bubble);
   chatBox.scrollTop = chatBox.scrollHeight;
@@ -42,7 +44,7 @@ function displayMessage(text, sender) {
   if (sender === "assistant") messageSound.play();
 }
 
-// gérer l’envoi de message
+// envoyer un message
 chatForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const message = userInput.value.trim();
@@ -67,4 +69,3 @@ chatForm.addEventListener("submit", async (e) => {
     displayMessage("[Erreur serveur]", "assistant");
   }
 });
-
