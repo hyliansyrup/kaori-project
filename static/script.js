@@ -8,15 +8,18 @@ const chatList = document.getElementById("chat-list");
 const newChatButton = document.getElementById("new-chat");
 const sidebar = document.querySelector(".sidebar");
 const sidebarHeader = document.querySelector(".sidebar-header");
+
 const toggleSidebarButton = document.createElement("button");
 toggleSidebarButton.id = "toggle-sidebar";
 toggleSidebarButton.textContent = "☰";
-toggleSidebarButton.classList.add("rotate");
-sidebarHeader.appendChild(toggleSidebarButton);
+toggleSidebarButton.title = "Afficher/Masquer";
+toggleSidebarButton.classList.add("toggle-button");
+document.body.appendChild(toggleSidebarButton);
 
-let assistantName = "Claude";
+let assistantName = "Kaori";
 let chats = [];
 let currentChatIndex = -1;
+let sidebarVisible = true;
 
 function saveChats() {
   localStorage.setItem("kaori_chats", JSON.stringify(chats));
@@ -62,7 +65,7 @@ newChatButton.onclick = () => {
 };
 
 document.getElementById("assistant-name").addEventListener("input", (e) => {
-  assistantName = e.target.value || "Claude";
+  assistantName = e.target.value || "Kaori";
   document.querySelectorAll(".bubble.assistant .name").forEach(el => {
     el.textContent = assistantName;
   });
@@ -80,7 +83,7 @@ function cleanResponse(text) {
   return text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
 }
 
-function formatText(text) {
+function formatMarkdown(text) {
   return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 }
 
@@ -97,7 +100,7 @@ function displayMessage(text, sender) {
   }
 
   const messageText = document.createElement("div");
-  messageText.innerHTML = formatText(text);
+  messageText.innerHTML = formatMarkdown(text);
   bubble.appendChild(messageText);
 
   chatBox.appendChild(bubble);
@@ -142,7 +145,6 @@ chatForm.addEventListener("submit", async (e) => {
   }
 });
 
-let sidebarVisible = true;
 toggleSidebarButton.onclick = () => {
   sidebarVisible = !sidebarVisible;
   sidebar.style.display = sidebarVisible ? "flex" : "none";
