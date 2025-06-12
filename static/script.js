@@ -9,7 +9,7 @@ const newChatButton = document.getElementById("new-chat");
 const sidebar = document.querySelector(".sidebar");
 const chatArea = document.querySelector(".chat-area");
 
-let assistantName = "Claude";
+let assistantName = "Kaori";
 let chats = [];
 let currentChatIndex = -1;
 
