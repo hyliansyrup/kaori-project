@@ -69,3 +69,11 @@ chatForm.addEventListener("submit", async (e) => {
     displayMessage("[Erreur serveur]", "assistant");
   }
 });
+document.getElementById("new-chat").addEventListener("click", () => {
+  const name = prompt("Nom de la conversation ?");
+  if (!name) return;
+  const li = document.createElement("li");
+  li.textContent = name;
+  li.contentEditable = true;
+  document.getElementById("chat-list").appendChild(li);
+});
