@@ -8,6 +8,8 @@ api_key = os.getenv("OPENROUTER_API_KEY")
 
 app = Flask(__name__, static_folder='static')
 
+app.run(host="0.0.0.0", port=10000, debug=True)
+
 @app.route("/")
 def index():
     return send_from_directory('.', 'index.html')
