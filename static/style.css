@@ -1,3 +1,5 @@
+/* style.css */
+
 :root {
   --bubble-color: #f6a6e3;
   --accent-color: #f6a6e3;
@@ -56,10 +58,22 @@ body {
   cursor: pointer;
   background-color: #fff;
   transition: background 0.3s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 #chat-list li:hover {
   background-color: #eee;
+}
+
+#chat-list li button {
+  background: none;
+  border: none;
+  color: red;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 8px;
 }
 
 .color-button {
@@ -131,18 +145,18 @@ button[type="submit"] {
   line-height: 1.4;
   position: relative;
   white-space: pre-wrap;
+  background: #eee;
+  color: black;
 }
 
 .bubble.user {
-  background: var(--accent-color);
-  color: black;
+  background: #f2f2f2;
   align-self: flex-end;
   border-bottom-right-radius: 0;
 }
 
 .bubble.assistant {
   background: var(--bubble-color);
-  color: black;
   align-self: flex-start;
   border-bottom-left-radius: 0;
 }
