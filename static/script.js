@@ -9,17 +9,17 @@ const newChatButton = document.getElementById("new-chat");
 const sidebar = document.querySelector(".sidebar");
 const sidebarHeader = document.querySelector(".sidebar-header");
 
-const toggleSidebarButton = document.createElement("button");
-toggleSidebarButton.id = "toggle-sidebar";
-toggleSidebarButton.textContent = "☰";
-toggleSidebarButton.title = "Afficher/Masquer";
-toggleSidebarButton.classList.add("toggle-button");
-document.body.appendChild(toggleSidebarButton);
-
 let assistantName = "Kaori";
 let chats = [];
 let currentChatIndex = -1;
 let sidebarVisible = true;
+
+const toggleSidebarButton = document.createElement("button");
+toggleSidebarButton.id = "toggle-sidebar";
+toggleSidebarButton.textContent = "☰";
+toggleSidebarButton.title = "Afficher/Masquer la barre";
+toggleSidebarButton.classList.add("rotate");
+document.body.appendChild(toggleSidebarButton);
 
 function saveChats() {
   localStorage.setItem("kaori_chats", JSON.stringify(chats));
@@ -83,7 +83,7 @@ function cleanResponse(text) {
   return text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
 }
 
-function formatMarkdown(text) {
+function formatText(text) {
   return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 }
 
@@ -100,7 +100,7 @@ function displayMessage(text, sender) {
   }
 
   const messageText = document.createElement("div");
-  messageText.innerHTML = formatMarkdown(text);
+  messageText.innerHTML = formatText(text);
   bubble.appendChild(messageText);
 
   chatBox.appendChild(bubble);
@@ -149,6 +149,9 @@ toggleSidebarButton.onclick = () => {
   sidebarVisible = !sidebarVisible;
   sidebar.style.display = sidebarVisible ? "flex" : "none";
   toggleSidebarButton.classList.toggle("rotated", !sidebarVisible);
+  toggleSidebarButton.style.position = "fixed";
+  toggleSidebarButton.style.top = "10px";
+  toggleSidebarButton.style.left = sidebarVisible ? "270px" : "10px";
 };
 
 loadChats();
