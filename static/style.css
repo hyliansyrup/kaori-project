@@ -1,3 +1,4 @@
+/* style.css */
 :root {
   --bubble-color: #f6a6e3;
   --accent-color: #f6a6e3;
@@ -35,44 +36,31 @@ body {
   top: 0;
   bottom: 0;
   overflow-y: auto;
-  z-index: 2;
   transition: transform 0.3s ease;
+  z-index: 2;
 }
 
 .sidebar.hidden {
   transform: translateX(-100%);
 }
 
-.chat-area {
-  margin-left: 260px;
+.sidebar-header {
   display: flex;
-  flex-direction: column;
-  width: calc(100% - 260px);
-  height: 100vh;
-  transition: margin-left 0.3s ease, width 0.3s ease;
-}
-
-.chat-area.expanded {
-  margin-left: 0;
-  width: 100%;
+  align-items: center;
+  justify-content: space-between;
 }
 
 #toggle-sidebar {
-  align-self: flex-start;
-  margin-bottom: 8px;
-  background-color: var(--accent-color);
-  color: white;
+  background: none;
   border: none;
-  border-radius: 6px;
-  padding: 6px 10px;
-  font-size: 20px;
+  font-size: 24px;
   cursor: pointer;
+  transform: rotate(0deg);
+  transition: transform 0.3s ease;
 }
 
-.sidebar h2 {
-  margin: 0;
-  display: inline-block;
-  margin-left: 8px;
+#toggle-sidebar.rotated {
+  transform: rotate(180deg);
 }
 
 #chat-list {
@@ -115,6 +103,20 @@ body {
   border-radius: 8px;
   border: 1px solid #ccc;
   box-sizing: border-box;
+}
+
+.chat-area {
+  margin-left: 260px;
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 260px);
+  height: 100vh;
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar.hidden + .chat-area {
+  margin-left: 0;
+  width: 100%;
 }
 
 .chat-box {
@@ -160,11 +162,12 @@ button[type="submit"] {
   line-height: 1.4;
   position: relative;
   white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .bubble.user {
-  background: #e0e0e0;
-  color: black;
+  background: var(--accent-color);
+  color: white;
   align-self: flex-end;
   border-bottom-right-radius: 0;
 }
@@ -180,4 +183,25 @@ button[type="submit"] {
   font-size: 12px;
   font-weight: bold;
   margin-bottom: 4px;
+}
+
+@media screen and (max-width: 768px) {
+  .sidebar {
+    position: absolute;
+    z-index: 10;
+  }
+  .chat-area {
+    margin-left: 0;
+    width: 100%;
+  }
+  #toggle-sidebar {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    background: var(--accent-color);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    z-index: 20;
+  }
 }
