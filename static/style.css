@@ -1,158 +1,211 @@
-// script.js
-
-const chatForm = document.getElementById("chat-form");
-const userInput = document.getElementById("user-input");
-const chatBox = document.getElementById("chat-box");
-const messageSound = new Audio("static/message.mp3");
-const chatList = document.getElementById("chat-list");
-const newChatButton = document.getElementById("new-chat");
-const sidebar = document.querySelector(".sidebar");
-const sidebarHeader = document.querySelector(".sidebar-header");
-
-let assistantName = "Kaori";
-let chats = [];
-let currentChatIndex = -1;
-let sidebarVisible = true;
-
-const toggleSidebarButton = document.createElement("button");
-toggleSidebarButton.id = "toggle-sidebar";
-toggleSidebarButton.textContent = "☰";
-toggleSidebarButton.title = "Afficher/Masquer la barre";
-toggleSidebarButton.classList.add("rotate");
-document.body.appendChild(toggleSidebarButton);
-
-function saveChats() {
-  localStorage.setItem("kaori_chats", JSON.stringify(chats));
+:root {
+  --bubble-color: #f6a6e3;
+  --accent-color: #f6a6e3;
+  --bg-color: #ffffff;
+  --text-color: #333333;
 }
 
-function loadChats() {
-  const saved = localStorage.getItem("kaori_chats");
-  if (saved) chats = JSON.parse(saved);
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
 }
 
-function updateChatList() {
-  chatList.innerHTML = "";
-  chats.forEach((chat, index) => {
-    const li = document.createElement("li");
-    li.innerHTML = `<span>Discussion ${index + 1}</span> <button onclick="deleteChat(${index})">✕</button>`;
-    li.onclick = () => switchChat(index);
-    chatList.appendChild(li);
-  });
+.container {
+  display: flex;
+  width: 100%;
+  height: 100%;
 }
 
-function deleteChat(index) {
-  chats.splice(index, 1);
-  if (currentChatIndex === index) {
-    currentChatIndex = -1;
-    chatBox.innerHTML = "";
+.sidebar {
+  width: 260px;
+  background: #f2f2f2;
+  border-right: 1px solid #ccc;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.sidebar.hidden {
+  transform: translateX(-100%);
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#toggle-sidebar {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+#toggle-sidebar.rotated {
+  transform: rotate(180deg);
+}
+
+#toggle-sidebar.fixed {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  background: var(--accent-color);
+  color: white;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+}
+
+#chat-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+#chat-list li {
+  padding: 8px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  background-color: #fff;
+  transition: background 0.3s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#chat-list li:hover {
+  background-color: #eee;
+}
+
+.color-button {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  margin: 0 4px;
+  cursor: pointer;
+}
+
+.assistant-settings input {
+  padding: 6px;
+  margin-bottom: 8px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.chat-box {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+form {
+  display: flex;
+  padding: 16px;
+  border-top: 1px solid #ddd;
+  background: #fafafa;
+}
+
+input[type="text"] {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 24px;
+  font-size: 16px;
+  outline: none;
+  margin-right: 10px;
+}
+
+button[type="submit"] {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 24px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.bubble {
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 18px;
+  margin: 8px;
+  line-height: 1.4;
+  position: relative;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.bubble.user {
+  background: var(--accent-color);
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 0;
+}
+
+.bubble.assistant {
+  background: var(--bubble-color);
+  color: black;
+  align-self: flex-start;
+  border-bottom-left-radius: 0;
+}
+
+.bubble .name {
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 10;
+    transform: translateX(0);
   }
-  saveChats();
-  updateChatList();
-}
 
-function switchChat(index) {
-  currentChatIndex = index;
-  chatBox.innerHTML = "";
-  chats[index].forEach(msg => displayMessage(msg.text, msg.sender));
-}
-
-newChatButton.onclick = () => {
-  chats.push([]);
-  currentChatIndex = chats.length - 1;
-  chatBox.innerHTML = "";
-  saveChats();
-  updateChatList();
-};
-
-document.getElementById("assistant-name").addEventListener("input", (e) => {
-  assistantName = e.target.value || "Kaori";
-  document.querySelectorAll(".bubble.assistant .name").forEach(el => {
-    el.textContent = assistantName;
-  });
-});
-
-document.querySelectorAll(".color-button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const color = btn.dataset.color;
-    document.documentElement.style.setProperty('--bubble-color', color);
-    document.documentElement.style.setProperty('--accent-color', color);
-  });
-});
-
-function cleanResponse(text) {
-  return text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-}
-
-function formatText(text) {
-  return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-}
-
-function displayMessage(text, sender) {
-  const bubble = document.createElement("div");
-  bubble.classList.add("bubble", sender);
-
-  if (sender === "assistant") {
-    const name = document.createElement("div");
-    name.classList.add("name");
-    name.textContent = assistantName;
-    bubble.appendChild(name);
-    text = cleanResponse(text);
+  .sidebar.hidden {
+    transform: translateX(-100%);
   }
 
-  const messageText = document.createElement("div");
-  messageText.innerHTML = formatText(text);
-  bubble.appendChild(messageText);
+  .chat-area {
+    width: 100%;
+    margin-left: 0;
+  }
 
-  chatBox.appendChild(bubble);
-  chatBox.scrollTop = chatBox.scrollHeight;
-
-  if (sender === "assistant") messageSound.play();
-
-  if (currentChatIndex >= 0) {
-    chats[currentChatIndex].push({ text, sender });
-    saveChats();
+  #toggle-sidebar {
+    display: block;
   }
 }
-
-chatForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const message = userInput.value.trim();
-  if (!message) return;
-
-  if (currentChatIndex < 0) {
-    chats.push([]);
-    currentChatIndex = chats.length - 1;
-    updateChatList();
-  }
-
-  displayMessage(message, "user");
-  userInput.value = "";
-
-  try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ message })
-    });
-
-    const data = await res.json();
-    displayMessage(data.reply, "assistant");
-  } catch (err) {
-    console.error("Erreur :", err);
-    displayMessage("[Erreur serveur]", "assistant");
-  }
-});
-
-toggleSidebarButton.onclick = () => {
-  sidebarVisible = !sidebarVisible;
-  sidebar.style.display = sidebarVisible ? "flex" : "none";
-  toggleSidebarButton.classList.toggle("rotated", !sidebarVisible);
-  toggleSidebarButton.style.position = "fixed";
-  toggleSidebarButton.style.top = "10px";
-  toggleSidebarButton.style.left = sidebarVisible ? "270px" : "10px";
-};
-
-loadChats();
-updateChatList();
