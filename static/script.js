@@ -156,3 +156,11 @@ toggleSidebarButton.onclick = () => {
 
 loadChats();
 updateChatList();
+
+document.getElementById("toggle-theme").addEventListener("change", () => {
+  document.body.classList.toggle("dark");
+  const textColor = document.body.classList.contains("dark") ? "white" : "black";
+  document.querySelectorAll(".bubble").forEach(b => {
+    b.style.color = textColor;
+  });
+});
