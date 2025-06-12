@@ -21,7 +21,7 @@ def chat():
     }
 
     payload = {
-        "model": "llama3-8b-8192",
+        "model": "qwen/qwen3-32b",
         "messages": [
             {"role": "user", "content": user_msg}
         ]
