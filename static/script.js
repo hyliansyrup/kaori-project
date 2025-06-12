@@ -1,27 +1,67 @@
 // script.js
+
 const chatForm = document.getElementById("chat-form");
 const userInput = document.getElementById("user-input");
 const chatBox = document.getElementById("chat-box");
 const messageSound = new Audio("static/message.mp3");
 const chatList = document.getElementById("chat-list");
-const newChatBtn = document.getElementById("new-chat");
+const newChatButton = document.getElementById("new-chat");
 
 let assistantName = "Claude";
-let currentChatId = null;
-let chats = {}; // Store chats in memory
+let chats = [];
+let currentChatIndex = -1;
 
-// Met à jour le nom de l'assistant
-const nameInput = document.getElementById("assistant-name");
-nameInput.addEventListener("input", (e) => {
+function saveChats() {
+  localStorage.setItem("kaori_chats", JSON.stringify(chats));
+}
+
+function loadChats() {
+  const saved = localStorage.getItem("kaori_chats");
+  if (saved) chats = JSON.parse(saved);
+}
+
+function updateChatList() {
+  chatList.innerHTML = "";
+  chats.forEach((chat, index) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<span>Discussion ${index + 1}</span> <button onclick="deleteChat(${index})">✕</button>`;
+    li.onclick = () => switchChat(index);
+    chatList.appendChild(li);
+  });
+}
+
+function deleteChat(index) {
+  chats.splice(index, 1);
+  if (currentChatIndex === index) {
+    currentChatIndex = -1;
+    chatBox.innerHTML = "";
+  }
+  saveChats();
+  updateChatList();
+}
+
+function switchChat(index) {
+  currentChatIndex = index;
+  chatBox.innerHTML = "";
+  chats[index].forEach(msg => displayMessage(msg.text, msg.sender));
+}
+
+newChatButton.onclick = () => {
+  chats.push([]);
+  currentChatIndex = chats.length - 1;
+  chatBox.innerHTML = "";
+  saveChats();
+  updateChatList();
+};
+
+document.getElementById("assistant-name").addEventListener("input", (e) => {
   assistantName = e.target.value || "Claude";
   document.querySelectorAll(".bubble.assistant .name").forEach(el => {
     el.textContent = assistantName;
   });
 });
 
-// Choix de couleur pastel pour les bulles
-const colorButtons = document.querySelectorAll(".color-button");
-colorButtons.forEach(btn => {
+document.querySelectorAll(".color-button").forEach(btn => {
   btn.addEventListener("click", () => {
     const color = btn.dataset.color;
     document.documentElement.style.setProperty('--bubble-color', color);
@@ -29,49 +69,6 @@ colorButtons.forEach(btn => {
   });
 });
 
-// Création d'une nouvelle discussion
-newChatBtn.addEventListener("click", () => {
-  const id = Date.now();
-  chats[id] = [];
-  currentChatId = id;
-  renderChatList();
-  chatBox.innerHTML = "";
-});
-
-// Affiche la liste des discussions avec boutons de suppression
-function renderChatList() {
-  chatList.innerHTML = "";
-  Object.keys(chats).forEach(id => {
-    const li = document.createElement("li");
-    li.textContent = `Chat ${id}`;
-    li.addEventListener("click", () => {
-      currentChatId = id;
-      loadChat(id);
-    });
-
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "×";
-    delBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      delete chats[id];
-      if (currentChatId === id) {
-        currentChatId = null;
-        chatBox.innerHTML = "";
-      }
-      renderChatList();
-    });
-
-    li.appendChild(delBtn);
-    chatList.appendChild(li);
-  });
-}
-
-function loadChat(id) {
-  chatBox.innerHTML = "";
-  chats[id].forEach(msg => displayMessage(msg.text, msg.sender));
-}
-
-// Affiche un message dans le chat
 function displayMessage(text, sender) {
   const bubble = document.createElement("div");
   bubble.classList.add("bubble", sender);
@@ -92,16 +89,22 @@ function displayMessage(text, sender) {
 
   if (sender === "assistant") messageSound.play();
 
-  if (currentChatId) {
-    chats[currentChatId].push({ text, sender });
+  if (currentChatIndex >= 0) {
+    chats[currentChatIndex].push({ text, sender });
+    saveChats();
   }
 }
 
-// Envoie du message à l’API Flask
 chatForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const message = userInput.value.trim();
-  if (!message || currentChatId === null) return;
+  if (!message) return;
+
+  if (currentChatIndex < 0) {
+    chats.push([]);
+    currentChatIndex = chats.length - 1;
+    updateChatList();
+  }
 
   displayMessage(message, "user");
   userInput.value = "";
@@ -114,9 +117,15 @@ chatForm.addEventListener("submit", async (e) => {
       },
       body: JSON.stringify({ message })
     });
+
     const data = await res.json();
     displayMessage(data.reply, "assistant");
   } catch (err) {
+    console.error("Erreur :", err);
     displayMessage("[Erreur serveur]", "assistant");
   }
 });
+
+// Initialisation
+loadChats();
+updateChatList();
