@@ -7,14 +7,27 @@ const messageSound = new Audio("static/message.mp3");
 const chatList = document.getElementById("chat-list");
 const newChatButton = document.getElementById("new-chat");
 const sidebar = document.querySelector(".sidebar");
-const toggleSidebarButton = document.createElement("button");
-toggleSidebarButton.id = "toggle-sidebar";
-toggleSidebarButton.textContent = "☰";
-document.body.appendChild(toggleSidebarButton);
+const chatArea = document.querySelector(".chat-area");
 
 let assistantName = "Claude";
 let chats = [];
 let currentChatIndex = -1;
+
+// Créer le bouton et le placer après le titre "Conversations"
+const toggleContainer = document.createElement("div");
+toggleContainer.style.display = "flex";
+toggleContainer.style.alignItems = "center";
+toggleContainer.style.gap = "8px";
+
+const h2 = sidebar.querySelector("h2");
+toggleContainer.appendChild(h2);
+
+const toggleSidebarButton = document.createElement("button");
+toggleSidebarButton.id = "toggle-sidebar";
+toggleSidebarButton.textContent = "☰";
+toggleContainer.appendChild(toggleSidebarButton);
+
+sidebar.insertBefore(toggleContainer, sidebar.firstChild);
 
 function saveChats() {
   localStorage.setItem("kaori_chats", JSON.stringify(chats));
@@ -74,6 +87,10 @@ document.querySelectorAll(".color-button").forEach(btn => {
   });
 });
 
+function cleanResponse(text) {
+  return text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+}
+
 function displayMessage(text, sender) {
   const bubble = document.createElement("div");
   bubble.classList.add("bubble", sender);
@@ -124,7 +141,8 @@ chatForm.addEventListener("submit", async (e) => {
     });
 
     const data = await res.json();
-    displayMessage(data.reply, "assistant");
+    const cleaned = cleanResponse(data.reply);
+    displayMessage(cleaned, "assistant");
   } catch (err) {
     console.error("Erreur :", err);
     displayMessage("[Erreur serveur]", "assistant");
@@ -135,7 +153,9 @@ chatForm.addEventListener("submit", async (e) => {
 let sidebarVisible = true;
 toggleSidebarButton.onclick = () => {
   sidebarVisible = !sidebarVisible;
-  sidebar.style.display = sidebarVisible ? "flex" : "none";
+  sidebar.classList.toggle("hidden", !sidebarVisible);
+  chatArea.classList.toggle("expanded", !sidebarVisible);
+  toggleSidebarButton.classList.toggle("rotated", !sidebarVisible);
 };
 
 // Initialisation
