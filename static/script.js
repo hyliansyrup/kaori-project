@@ -7,27 +7,16 @@ const messageSound = new Audio("static/message.mp3");
 const chatList = document.getElementById("chat-list");
 const newChatButton = document.getElementById("new-chat");
 const sidebar = document.querySelector(".sidebar");
-const chatArea = document.querySelector(".chat-area");
-
-let assistantName = "Kaori";
-let chats = [];
-let currentChatIndex = -1;
-
-// Créer le bouton et le placer après le titre "Conversations"
-const toggleContainer = document.createElement("div");
-toggleContainer.style.display = "flex";
-toggleContainer.style.alignItems = "center";
-toggleContainer.style.gap = "8px";
-
-const h2 = sidebar.querySelector("h2");
-toggleContainer.appendChild(h2);
-
+const sidebarHeader = document.querySelector(".sidebar-header");
 const toggleSidebarButton = document.createElement("button");
 toggleSidebarButton.id = "toggle-sidebar";
 toggleSidebarButton.textContent = "☰";
-toggleContainer.appendChild(toggleSidebarButton);
+toggleSidebarButton.classList.add("rotate");
+sidebarHeader.appendChild(toggleSidebarButton);
 
-sidebar.insertBefore(toggleContainer, sidebar.firstChild);
+let assistantName = "Claude";
+let chats = [];
+let currentChatIndex = -1;
 
 function saveChats() {
   localStorage.setItem("kaori_chats", JSON.stringify(chats));
@@ -91,6 +80,10 @@ function cleanResponse(text) {
   return text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
 }
 
+function formatText(text) {
+  return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+}
+
 function displayMessage(text, sender) {
   const bubble = document.createElement("div");
   bubble.classList.add("bubble", sender);
@@ -100,10 +93,11 @@ function displayMessage(text, sender) {
     name.classList.add("name");
     name.textContent = assistantName;
     bubble.appendChild(name);
+    text = cleanResponse(text);
   }
 
   const messageText = document.createElement("div");
-  messageText.textContent = text;
+  messageText.innerHTML = formatText(text);
   bubble.appendChild(messageText);
 
   chatBox.appendChild(bubble);
@@ -141,23 +135,19 @@ chatForm.addEventListener("submit", async (e) => {
     });
 
     const data = await res.json();
-    const cleaned = cleanResponse(data.reply);
-    displayMessage(cleaned, "assistant");
+    displayMessage(data.reply, "assistant");
   } catch (err) {
     console.error("Erreur :", err);
     displayMessage("[Erreur serveur]", "assistant");
   }
 });
 
-// Sidebar toggle
 let sidebarVisible = true;
 toggleSidebarButton.onclick = () => {
   sidebarVisible = !sidebarVisible;
-  sidebar.classList.toggle("hidden", !sidebarVisible);
-  chatArea.classList.toggle("expanded", !sidebarVisible);
+  sidebar.style.display = sidebarVisible ? "flex" : "none";
   toggleSidebarButton.classList.toggle("rotated", !sidebarVisible);
 };
 
-// Initialisation
 loadChats();
 updateChatList();
