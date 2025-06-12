@@ -5,7 +5,7 @@ const messageSound = new Audio("static/message.mp3");
 
 let assistantName = "Claude";
 
-// changement du nom de l’assistant
+// Met à jour le nom affiché de l’assistant
 document.getElementById("assistant-name").addEventListener("input", (e) => {
   assistantName = e.target.value || "Claude";
   document.querySelectorAll(".bubble.assistant .name").forEach(el => {
@@ -13,7 +13,7 @@ document.getElementById("assistant-name").addEventListener("input", (e) => {
   });
 });
 
-// changement de couleurs instantané
+// Met à jour les couleurs pastel en live
 document.querySelectorAll(".color-button").forEach(btn => {
   btn.addEventListener("click", () => {
     const color = btn.dataset.color;
@@ -22,7 +22,7 @@ document.querySelectorAll(".color-button").forEach(btn => {
   });
 });
 
-// afficher un message
+// Ajoute une bulle dans la fenêtre de discussion
 function displayMessage(text, sender) {
   const bubble = document.createElement("div");
   bubble.classList.add("bubble", sender);
@@ -44,7 +44,7 @@ function displayMessage(text, sender) {
   if (sender === "assistant") messageSound.play();
 }
 
-// envoyer un message
+// Soumet le message à l’API locale
 chatForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const message = userInput.value.trim();
