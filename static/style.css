@@ -7,10 +7,51 @@
 
 body.dark {
   --bg-color: #1a1a1a;
-  --text-color: #f2f2f2;
-  --bubble-color: #2a2a2a;
-  --accent-color: #444444;
+  --text-color: #ffffff;
 }
+
+/* zone input + formulaire */
+body.dark form {
+  background-color: #2a2a2a;
+  border-top: 1px solid #444;
+}
+
+body.dark input[type="text"] {
+  background-color: #1a1a1a;
+  color: white;
+  border: 1px solid #555;
+}
+
+body.dark button[type="submit"] {
+  color: white;
+}
+
+/* barre latérale */
+body.dark .sidebar {
+  background: #1f1f1f;
+  border-right: 1px solid #444;
+}
+
+body.dark #chat-list li {
+  background-color: #2a2a2a;
+  color: white;
+}
+
+body.dark #chat-list li:hover {
+  background-color: #333;
+}
+
+body.dark .sidebar h2,
+body.dark .assistant-settings input {
+  color: white;
+}
+
+body.dark .assistant-settings input {
+  background-color: #1a1a1a;
+  border: 1px solid #555;
+  color: white;
+}
+
 
 body {
   margin: 0;
